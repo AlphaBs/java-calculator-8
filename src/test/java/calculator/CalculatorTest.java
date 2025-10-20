@@ -66,14 +66,32 @@ public class CalculatorTest {
         assertThrows(IllegalArgumentException.class, () -> calc.calculate("101;32"));
     }
 
-    @Test
-    void error_end_of_delimiter() {
-        assertThrows(IllegalArgumentException.class, () -> calc.calculate("101:3,"));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "101:3,",
+            "1,2:"
+    })
+    void error_end_of_delimiter(String input) {
+        assertThrows(IllegalArgumentException.class, () -> calc.calculate(input));
     }
 
-    @Test
-    void error_no_number_between_delimiter() {
-        assertThrows(IllegalArgumentException.class, () -> calc.calculate("101:3,:3"));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "1,,2",
+            "1::2",
+            "101:3,:3"
+    })
+    void error_no_number_between_delimiter(String input) {
+        assertThrows(IllegalArgumentException.class, () -> calc.calculate(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            ",1:2",
+            ":1,2"
+    })
+    void error_start_with_default_delimiter(String input) {
+        assertThrows(IllegalArgumentException.class, () -> calc.calculate(input));
     }
 
     @Test
