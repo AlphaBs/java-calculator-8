@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Calculator {
-    private final ExpressionParser parser = new ExpressionParser();
+    private static final char DONE = StringCharacterIterator.DONE;
 
     public long calculate(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException("입력은 null일 수 없습니다.");
+        }
         List<Long> numbers = parse(input);
-        Long sum = 0L;
-        for (Long number : numbers) {
+        long sum = 0L;
+        for (long number : numbers) {
             sum += number;
         }
         return sum;
@@ -18,14 +21,15 @@ public class Calculator {
 
     private List<Long> parse(String input) {
         StringCharacterIterator iterator = new StringCharacterIterator(input);
-        List<Character> delimiters = parseDelimiters(iterator);
-        return parser.parseNumbers(iterator, delimiters);
+        ExpressionReader reader = new ExpressionReader(iterator);
+        List<Character> delimiters = parseDelimiters(reader);
+        return reader.readNumbers(delimiters);
     }
 
-    private List<Character> parseDelimiters(StringCharacterIterator iterator) {
+    private List<Character> parseDelimiters(ExpressionReader reader) {
         List<Character> delimiters = createDefaultDelimiters();
-        char customDelimiter = parser.parseCustomDelimiter(iterator);
-        if (customDelimiter != StringCharacterIterator.DONE) {
+        char customDelimiter = reader.readCustomDelimiter();
+        if (customDelimiter != DONE) {
             delimiters.add(customDelimiter);
         }
         return delimiters;
